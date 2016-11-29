@@ -1,3 +1,4 @@
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
@@ -19,17 +20,30 @@ public class GradientArt {
 	
 	static BufferedImage art;
 	static Graphics g;
+	static Random r = new Random();
+	
+	static float fociHue = r.nextFloat();
+	static float hueShift = r.nextFloat();
 	
 	public static void main(String[] args) throws IOException{
 		art = new BufferedImage(defaultHeight, defaultHeight, BufferedImage.TYPE_INT_RGB);
 		g = art.getGraphics();
+		
+
+		
+		Color fociColor = Color.getHSBColor(fociHue, r.nextFloat(), r.nextFloat());
+		g.setColor(fociColor);
+		//fociColor.get
 		
 		List<Point> foci = pickFoci(howManyFoci);
 		
 		for(int i = 0; i < squareSize; i++){
 			for(int j = 0; j < squareSize; j++){
 				
-				drawSquare(i, j, mapDistToFocusToRatio(distFromNearestFocus(i, j, foci)));
+				int dist = distFromNearestFocus(i, j, foci);
+				
+				g.setColor(Color.getHSBColor((float) mapDistToHue(dist), 0.7f, 0.7f));
+				drawSquare(i, j, mapDistToFocusToRatio(dist));
 				
 			}
 		}
@@ -41,6 +55,14 @@ public class GradientArt {
 		for(int i = -5; i < 5; i++){
 			System.out.println(mapDistToFocusToRatio(i));
 			}
+	}
+	
+	private static double mapDistToHue(int dist){
+		int avgDist = 2;
+		int distdelta = dist-avgDist;
+		//return Math.log(distdelta) - 1;
+		double hueDelta = distdelta/3.0;
+		return (fociHue - hueShift)*hueDelta + fociHue;
 	}
 	
 	private static double mapDistToFocusToRatio(int dist){
