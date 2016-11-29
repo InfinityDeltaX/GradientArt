@@ -29,7 +29,8 @@ public class GradientArt {
 		
 		for(int i = 0; i < squareSize; i++){
 			for(int j = 0; j < squareSize; j++){
-				drawSquare(i, j);
+				
+				drawSquare(i, j, 1.9);
 			}
 		}
 		
@@ -55,10 +56,10 @@ public class GradientArt {
 		return out;
 	}
 	
-	private static void drawSquare(int xindex, int yindex){
-		int xStart = (squareSize*2)*xindex + squareSize;
-		int yStart = (squareSize*2)*yindex + squareSize;
+	private static void drawSquare(int xindex, int yindex, double ratio){
+		int xStart = (int) ((squareSize*2)*xindex + squareSize/2*3 - squareSize*ratio/2.0);
+		int yStart = (int) ((squareSize*2)*yindex + squareSize/2*3 - squareSize*ratio/2.0);
 		
-		g.fillRect(xStart, yStart, 10, 10);
+		g.fillRect(xStart, yStart, (int) (squareSize*ratio), (int) (squareSize*ratio));
 	}
 }
