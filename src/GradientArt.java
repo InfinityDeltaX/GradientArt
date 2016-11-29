@@ -24,21 +24,36 @@ public class GradientArt {
 		art = new BufferedImage(defaultHeight, defaultHeight, BufferedImage.TYPE_INT_RGB);
 		g = art.getGraphics();
 		
-		
-		List<Point> foci = pickFoci(3);
+		List<Point> foci = pickFoci(howManyFoci);
 		
 		for(int i = 0; i < squareSize; i++){
 			for(int j = 0; j < squareSize; j++){
 				
-				drawSquare(i, j, 1.9);
+				drawSquare(i, j, mapDistToFocusToRatio(distFromNearestFocus(i, j, foci)));
+				
 			}
 		}
 		
 		ImageIO.write(art, "png", new File("C:\\Users\\Robert\\Pictures\\Art\\GradientArt\\output.png"));
 	}
 	
+	private static void testFocusDistMapping(){
+		for(int i = -5; i < 5; i++){
+			System.out.println(mapDistToFocusToRatio(i));
+			}
+	}
+	
+	private static double mapDistToFocusToRatio(int dist){
+		//System.out.println(dist);
+		int avgDist = 2;
+		int distdelta = dist-avgDist;
+		//return Math.log(distdelta) - 1;
+		return 1 - distdelta/3.0;
+		//return 0.5;
+	}
+	
 	private static int distFromNearestFocus(int x, int y, List<Point> foci){
-		int minDist = 0;
+		int minDist = Integer.MAX_VALUE;
 		for(int i = 0; i < foci.size(); i++){
 			int dist = Math.abs(foci.get(i).x - x) + Math.abs(foci.get(i).y - y);
 			minDist = Math.min(dist, minDist);
