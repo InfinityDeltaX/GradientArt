@@ -18,18 +18,33 @@ public class GradientArt {
 	
 	static int defaultHeight = (squaresPerSide*2+1)*squareSize;
 	
-	static BufferedImage art;
-	static Graphics g;
+
 	static Random r = new Random();
 	
 	static float fociHue = r.nextFloat();
-	static float hueShift = r.nextFloat();
+	static float hueShift = fociHue + (r.nextFloat()*0.4f + 0.1f);
 	
 	public static void main(String[] args) throws IOException{
-		art = new BufferedImage(defaultHeight, defaultHeight, BufferedImage.TYPE_INT_RGB);
-		g = art.getGraphics();
+
 		
 
+		for(int i = 0; i < 100; i++){
+			randomInit();
+			ImageIO.write(generateImage(), "png", new File("C:\\Users\\Robert\\Pictures\\Art\\GradientArt\\output " + i + ".png"));
+		}
+	}
+	
+	private static void randomInit(){
+		fociHue = r.nextFloat();
+		hueShift = fociHue + (r.nextFloat()*0.4f + 0.1f);
+	}
+	
+	private static BufferedImage generateImage(){
+		BufferedImage art;
+		Graphics g;
+		
+		art = new BufferedImage(defaultHeight, defaultHeight, BufferedImage.TYPE_INT_RGB);
+		g = art.getGraphics();
 		
 		Color fociColor = Color.getHSBColor(fociHue, r.nextFloat(), r.nextFloat());
 		g.setColor(fociColor);
@@ -42,13 +57,13 @@ public class GradientArt {
 				
 				int dist = distFromNearestFocus(i, j, foci);
 				
-				g.setColor(Color.getHSBColor((float) mapDistToHue(dist), 0.7f, 0.7f));
-				drawSquare(i, j, mapDistToFocusToRatio(dist));
+				g.setColor(Color.getHSBColor((float) mapDistToHue(dist), (float) mapDistToSat(dist), (float) mapDistToBright(dist)));
+				drawSquare(i, j, mapDistToFocusToRatio(dist), g);
 				
 			}
 		}
 		
-		ImageIO.write(art, "png", new File("C:\\Users\\Robert\\Pictures\\Art\\GradientArt\\output.png"));
+		return art;
 	}
 	
 	private static void testFocusDistMapping(){
@@ -61,7 +76,8 @@ public class GradientArt {
 		int avgDist = 2;
 		int distdelta = dist-avgDist;
 		//return Math.log(distdelta) - 1;
-		double hueDelta = distdelta/3.0;
+		//double hueDelta = distdelta/8.0;
+		double hueDelta = -0.25*Math.pow(dist, .5) + 1;
 		return (fociHue - hueShift)*hueDelta + fociHue;
 	}
 	
@@ -69,9 +85,19 @@ public class GradientArt {
 		//System.out.println(dist);
 		int avgDist = 2;
 		int distdelta = dist-avgDist;
-		//return Math.log(distdelta) - 1;
-		return 1 - distdelta/3.0;
+		return 1 - distdelta/10.0;
+		//return -1*Math.pow(dist, .25) +2;
 		//return 0.5;
+	}
+	
+	private static double mapDistToSat(int dist){
+		//return 0.7;
+		return -0.25*Math.pow(dist, .5) + 1;
+	}
+	
+	private static double mapDistToBright(int dist){
+//		return 0.7;
+		return -0.25*Math.pow(dist, .5) + 1;
 	}
 	
 	private static int distFromNearestFocus(int x, int y, List<Point> foci){
@@ -93,7 +119,7 @@ public class GradientArt {
 		return out;
 	}
 	
-	private static void drawSquare(int xindex, int yindex, double ratio){
+	private static void drawSquare(int xindex, int yindex, double ratio, Graphics g){
 		int xStart = (int) ((squareSize*2)*xindex + squareSize/2*3 - squareSize*ratio/2.0);
 		int yStart = (int) ((squareSize*2)*yindex + squareSize/2*3 - squareSize*ratio/2.0);
 		
